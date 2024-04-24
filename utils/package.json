@@ -1,6 +1,8 @@
 {
   "name": "utils",
   "dependencies": {
-    "logger": "file:utils/logger.mjs"
+    "logger": "file:utils/logger.mjs",
+    "config": "file:utils/config.mjs",
+    "dbconn": "file:utils/dbconn.mjs"
   }
 }

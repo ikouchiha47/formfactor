@@ -9,7 +9,8 @@ services:
     ports:
       - "3307:3306"
     environment:
-      "MYSQL_ROOT_PASSWORD": flamingo
+      MYSQL_ROOT_PASSWORD: flamingo
+      MYSQL_DATABASE: formfactor
 
   redis:
     image: redis:alpine

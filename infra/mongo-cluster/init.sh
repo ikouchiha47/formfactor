@@ -15,4 +15,4 @@ docker compose exec router01 sh -c "mongosh < /scripts/init-router.js"
 
 echo "Init database with sharding"
 docker compose exec router01 sh -c "echo 'use formfactor' | mongosh"
-docker compose exec router01 sh -c "mongosh < /scripts/init-collection.sh"
+docker compose exec router01 sh -c "mongosh < /scripts/init-collection.js"
