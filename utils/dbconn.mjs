@@ -18,7 +18,7 @@ export class RedisConnector {
 
     try {
       this.client = createClient({url: this.uri});
-      logger.info("Connected to Redis successfully");
+      logger.debug("Connected to Redis successfully");
     } catch (error) {
       logger.error("Error connecting to Redis:", error);
       throw error;
@@ -49,7 +49,7 @@ export class MongoDBConnector {
       });
 
       await this.client.connect();
-      logger.info("Connected to MongoDB successfully");
+      logger.debug("Connected to MongoDB successfully");
     } catch (error) {
       logger.error("Error connecting to MongoDB:", error);
       throw error;
@@ -63,7 +63,7 @@ export class MongoDBConnector {
       const db = this.client.db(dbname);
       await db.admin().command({ enableSharding: dbname });
 
-      logger.info("sharding enabled")
+      logger.debug("sharding enabled")
 
       const collections = [
         {
@@ -116,7 +116,7 @@ export class MySQLConnector {
 
     try {
       this.connection = mysql.createPool(this.uri);
-      logger.info("Connected to MySQL successfully");
+      logger.debug("Connected to MySQL successfully");
     } catch (error) {
       logger.error("Error connecting to MySQL:", error);
       throw error;

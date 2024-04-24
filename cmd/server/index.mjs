@@ -11,6 +11,8 @@ import dotenv from 'dotenv';
 import { parseArgs } from "node:util";
 
 import logger from "utils/logger.mjs";
+import * as config from "utils/config.mjs";
+import * as dbconnman from "utils/dbconn.mjs";
 
 const args = parseArgs({
   options: {
@@ -31,9 +33,7 @@ const args = parseArgs({
 });
 
 
-dotenv.config({ path: args.values.envfile });
-
-export const setupApp = (mongoClient, sqlClient, redisClient) => {
+export const setupApp = async (mongoClient, sqlClient, redisClient) => {
   const app = express();
 
   const corsOptions = {
@@ -54,6 +54,10 @@ export const setupApp = (mongoClient, sqlClient, redisClient) => {
   if (!!args.values.port) {
     port = Number(args.values.port);
   }
+
+  app.get('/ping', (req, res) => {
+    res.status(200).send("pong")
+  })
 
   app.listen(port, () => {
     logger.info(`App listening on port ${port}`);
@@ -78,5 +82,16 @@ if (cluster.isMaster) {
 } else {
   logger.info(`Worker ${process.pid} started`);
 
-  setupApp();
+  const conf = config.GetConfig(args.values.envfile);
+
+  const mongoConn = new dbconnman.MongoDBConnector(conf.mongo_url);
+  await mongoConn.connect();
+
+  const mysqlConn = new dbconnman.MySQLConnector(conf.mysql_url, conf.mysql_db_name);
+  await mysqlConn.connect();
+
+  const redisConn = new dbconnman.RedisConnector(conf.redis_url)
+  await redisConn.connect()
+
+  await setupApp(mongoConn, mysqlConn, redisConn);
 }
