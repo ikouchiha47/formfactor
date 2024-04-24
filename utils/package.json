@@ -1,0 +1,6 @@
+{
+  "name": "utils",
+  "dependencies": {
+    "logger": "file:utils/logger.mjs"
+  }
+}

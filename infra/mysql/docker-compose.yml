@@ -1,0 +1,18 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    volumes:
+      - /tmp/mysqldb:/var/lib/mysql
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      "MYSQL_ROOT_PASSWORD": flamingo
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6380:6379"
