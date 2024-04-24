@@ -20,6 +20,8 @@
     "mysql2": "^3.9.7",
     "pino": "^8.20.0",
     "redis": "^4.6.13",
+    "ulidx": "^2.3.0",
+    "user-org-service": "file:src/user-org-service",
     "utils": "file:utils"
   },
   "devDependencies": {

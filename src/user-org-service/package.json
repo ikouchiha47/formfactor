@@ -1,0 +1,8 @@
+{
+    "name": "user-org-service",
+    "dependencies": {
+        "users": "file:src/user-org-service/users.mjs",
+        "organisations": "file:src/user-org-service/organisations.mjs"
+    }
+  }
+  

@@ -8,10 +8,26 @@ services:
     restart: always
     ports:
       - "3307:3306"
+    expose:
+      - "3306"
     environment:
       MYSQL_ROOT_PASSWORD: flamingo
       MYSQL_DATABASE: formfactor
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8081:80
+
+  
   redis:
     image: redis:alpine
     container_name: redis
