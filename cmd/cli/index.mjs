@@ -45,6 +45,57 @@ program.command('migrate').
     }
   });
 
+
+program.command('register:org').
+  description('Create Organisation').
+  requiredOption('--domain', 'Domain name prefixed with @. Example @somedomain.com').
+  requiredOption('--name', 'Organisation name').
+  action(async (options) => {
+    const conf = config.GetConfig(options.config);
+
+    try {
+      const conn = new dbconnman.MySQLConnector(conf.mysql_url, conf.mysql_db_name);
+      await conn.connect();
+
+      const orgRepo = new OrgRepository(conn.connection)
+      
+      var result = await orgRepo.create(options.domain, options.name)
+      console.log(result);
+    } catch(e) {
+      console.error(e)
+    } finally {
+      process.exit(0)
+    }
+  });
+
+program.command('register:user').
+  description('Create Org User').
+  requiredOption('--email', 'Email of user').
+  requiredOption('--password', 'Password minimum 6 characters').
+  option('--type', 'If the user is a admin, orguser or user', false).
+  action(async (options) => {
+    const conf = config.GetConfig(options.config);
+
+    try {
+      const conn = new dbconnman.MySQLConnector(conf.mysql_url, conf.mysql_db_name);
+      await conn.connect();
+
+      const orgRepo = new OrgRepository(conn.connection)
+      const userRepo = new UsersRepository(conn.connection)    
+      const userOrgSvc = new UserOrgService(userRepo, orgRepo)
+      
+      const userType = options.admin ? UserTypes.ORG_ADMIN : UserTypes.ORG_USER
+      var result = await userOrgSvc.createUser(userType, options.email, options.password)
+      
+      console.log(result);
+    } catch(e) {
+      console.error(e)
+    } finally {
+      process.exit(0)
+    }
+  })
+
+
 program.command('seed').
   description('Seed data for database').
   requiredOption('-c, --config <config>', 'Path to config file').

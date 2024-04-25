@@ -1,6 +1,8 @@
 import { ulid } from "ulidx"
 import logger from "utils/logger.mjs";
 import { ObjectId } from "mongodb";
+import { RankAnswersWithScore } from "./formranker.mjs";
+import { response } from "express";
 
 
 export const FormStates = {
@@ -149,7 +151,7 @@ const CreateFormRequest = {
     }
 }
 
-const isUndefinedEmptyArrayOrObject = (value) => {
+const isEmpty = (value) => {
     return value === undefined || 
         value == "" || 
         (Array.isArray(value) && value.length === 0) || 
@@ -168,12 +170,13 @@ const CreateAnswerRequest = {
     formID: undefined,
     answers: undefined,
 
-    validate: function(inputSchema) {
+    validate: function(inputSchema, formSchemas) {
+        const formSchemaMap = formSchemas.reduce((acc, schema) => ( {...acc, [schema.label]: schema } ), {})
         const inputSchemaMap = inputSchema.reduce((acc, schema) => ( {...acc, [schema.key]: schema.inputType } ), {})
         const entries = Object.entries(this).filter(([key, _]) => key != 'validate');
 
         const missings = entries.filter(([key, value]) => {
-            return isUndefinedEmptyArrayOrObject(value)
+            return isEmpty(value)
         })
 
         if(missings.length > 0) {
@@ -192,8 +195,15 @@ const CreateAnswerRequest = {
             return { label, value, valid: false }
            }
 
+           const required = formSchemaMap[label]?.required || false
+           if(required && isEmpty(value)) {
+            return false
+           }
+
            const valueType = inputSchemaMap[label];
            logger.info(`label ${label} value: ${value} valueType ${valueType} class ${getClassOf(value)}`)
+
+           // TODO: validate, options in choices for array types
 
            switch(valueType) {
             case "string":
@@ -269,11 +279,28 @@ export class FormsRepository {
                         find(clause, {projection: {...fields, _id: 0}})
     }
 
+    async findAnswersBy(clause, fields) {
+        return await this._db.
+                        collection(this.answercollection).
+                        find(clause, {projection: {...fields, _id: 0}})
+    }
+
     async findFormObject(id) {
         return await this._db.
                 collection(this.collection).
                 findOne({ "id": id }, { projection: {"_id": 0 } })    
     }
+}
+
+const EachAnswer = {
+
+}
+
+const AnswersResponse = {
+    title: undefined,
+    description: undefined,
+    totalSubmissions: undefined,
+    data: []
 }
 
 
@@ -403,7 +430,7 @@ export class FormsController {
             orgID: req.params.orgID,
         }
 
-        this.formsrepo.findBy(formParams, {formSchemas: 0}).then(results => {
+        this.formsrepo.findBy(formParams).then(results => {
             if(results && results.length == 0) {
                 throw 'bad_request'
             }
@@ -419,7 +446,7 @@ export class FormsController {
                 answers: (req.body.answers || []).map(answer => ( {label: answer.label, value: answer.value} ))
             })
             
-            if(!request.validate(result.searchSchema)) {
+            if(!request.validate(result.searchSchema, result.formSchemas)) {
                 res.status(422).json({ success: false, errors: 'invalid_input_values', errorCode: 'A1003' })
                 return
             }
@@ -435,6 +462,50 @@ export class FormsController {
             logger.error({err: e}, `Failed to create answer`);
             res.status(500).json({ success: false, errors: 'something_went_wrong', errorCode: 'A1001'});
         })
+    }
+
+    viewAnswers(req, res) {
+        const formParams = {
+            formID: req.params.formID,
+            orgID: req.params.orgID,
+        }
+
+        this.formsrepo.findBy({id: formParams.formID, orgID: formParams.orgID}).then(results => {
+            if(results && results.length == 0) {
+                throw 'bad_request'
+            }
+
+            return results.toArray()
+        }).then(docs => {
+            const form = docs[0]
+            
+            return Promise.allSettled([
+                Promise.resolve(form),
+                this.formsrepo.findAnswersBy(formParams, {formSchemas: 0}).then(results => results.toArray())
+            ])
+        }).then(promises => {
+            // console.log(JSON.stringify(promises[0], null, 4));
+            // console.log(JSON.stringify(promises[1], null, 4));
+            // handle rejected promise
+            const [form, answer] = promises;
+            if(form.status != 'fulfilled' || answer.status != 'fulfilled') {
+                throw 'DatabaseError'
+            }
+
+            const result = RankAnswersWithScore(form.value, answer.value)
+            const response = Object.assign(AnswersResponse, {
+                title: form.value.title,
+                description: form.value.description,
+                totalSubmissions: answer.value.length,
+                data: result,
+            })
+
+            res.status(200).json({success: true, response })
+        }).catch(e => {
+            console.error(e)
+            res.status(500).json({ success: false, error: 'something_went_wrong', errorCode: 'V1001'})
+        })
+
     }
 }
 
