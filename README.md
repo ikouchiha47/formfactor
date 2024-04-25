@@ -23,3 +23,10 @@ Build forms and collect reports.
 
 ## Design
 
+
+
+
+### APIs
+
+The implemented APIs are available in ./formfactor-insomnia.yaml. This can be
+imported to postman. [Guide here](https://learning.postman.com/docs/getting-started/importing-and-exporting/importing-from-insomnia/)

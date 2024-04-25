@@ -1,0 +1,339 @@
+_type: export
+__export_format: 4
+__export_date: 2024-04-25T12:24:15.893Z
+__export_source: insomnia.desktop.app:v9.0.0
+resources:
+  - _id: req_80ba8cb2e4a04f76a7d024b3e65d024d
+    parentId: fld_f64fd544c87444789389a4faf500e5cb
+    modified: 1713979717237
+    created: 1713977834935
+    url: http://localhost:9090/auth/login
+    name: Login
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"email": "llama@foobar.com",
+        	"password": "dalaillama"
+        }
+    preRequestScript: ""
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/8.6.1
+    authentication: {}
+    metaSortKey: -1713977834935
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_f64fd544c87444789389a4faf500e5cb
+    parentId: wrk_scratchpad
+    modified: 1713977830448
+    created: 1713977830448
+    name: FormFactor
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1713977830448
+    _type: request_group
+  - _id: wrk_scratchpad
+    parentId: null
+    modified: 1699816802697
+    created: 1699816802697
+    name: Scratch Pad
+    description: ""
+    scope: collection
+    _type: workspace
+  - _id: req_eda8254b47ce409981ed6b25b5c44d81
+    parentId: fld_f64fd544c87444789389a4faf500e5cb
+    modified: 1714034444952
+    created: 1713996418228
+    url: http://localhost:9090/orgs/01HW840WXF5TXPZW61FK2BCXXK/forms
+    name: FormCreate
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: >-
+        {
+        	"title": "Form Sample",
+        	"description": "A valid form with all input types",
+        	"formState": "published",
+        	"visibleFrom": "2024-04-24T22:30:30.052Z",
+        	"inputSchemas": [
+        		{
+        			"question": "Your name",
+        			"inputType": "text",
+        			"label": "name",
+        			"required": true
+        		},
+        		{
+        			"question": "Your email",
+        			"inputType": "text",
+        			"label": "email",
+        			"required": false
+        		},
+        		{
+        			"question": "Scale of 1 to 10 how likely are you to steal food at night",
+        			"inputType": "number",
+        			"label": "stealth",
+        			"required": true,
+        			"filter": {
+        				"t": "range",
+        				"range": {
+        					"min": -1,
+        					"max": 10
+        				}
+        			}
+        		},
+        		{
+        			"question": "Languages you know",
+        			"inputType": "select",
+        			"label": "languages",
+        			"required": true,
+        			"choices": ["English", "Swahili", "Golang"]
+        		},
+        		{
+        			"question": "A checkbox with some matching filter",
+        			"inputType": "checkbox",
+        			"label": "somematching",
+        			"required": true,
+        			"choices": ["Choice1", "Choice2", "Choice3", "Choice4"],
+        			"filter": {
+        				"t": "allof",
+        				"options": ["Choice2", "Choice3"]
+        			}
+        		},
+        		{
+        			"question": "A radio button to nuke your PC",
+        			"inputType": "radio",
+        			"label": "detonate",
+        			"required": true,
+        			"choices": ["Yes", "No"],
+        			"filter": {
+        				"t": "exact",
+        				"option": "No"
+        			}
+        		},
+        		{
+        			"question": "Heads or Tails",
+        			"inputType": "radio",
+        			"label": "toss",
+        			"required": true,
+        			"choices": ["Heads", "Tails"],
+        			"filter": {
+        				"t": "exact",
+        				"option": "Tails"
+        			}
+        		}
+        	]
+        }
+    preRequestScript: ""
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/9.0.0
+        id: pair_1a52c56d81f34decb577fb087f492277
+      - id: pair_751e96abf5a34e2995ffe8cc10d99710
+        name: Authorization
+        value: Bearer cca77be016055f32d911e488b26acc38
+        description: ""
+    authentication: {}
+    metaSortKey: -1713977835035
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_5fe569d45ab44f7a9f7e8a618cf07b0c
+    parentId: fld_f64fd544c87444789389a4faf500e5cb
+    modified: 1714034155297
+    created: 1714020270098
+    url: http://localhost:9090/orgs/01HW840WXF5TXPZW61FK2BCXXK/forms/01HWA67CK543J2CAGT6T1KGB3A
+    name: CreateAnswer
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"uid": "guset7@user.com",
+        	"answers": [
+        		{ "label": "name", "value": "string"},
+        		{ "label": "email", "value": "string"},
+        		{"label":  "stealth", "value": 10},
+        		{"label": "languages", "value": ["English", "Swahili"]},
+        		{ "label": "somematching", "value": ["Choice1", "Choice3"]},
+        		{"label": "detonate", "value": "Yes"},
+        		{"label": "toss", "value": "Heads"}
+        	]
+        }
+    preRequestScript: ""
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/9.0.0
+    authentication: {}
+    metaSortKey: -1714020270098
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_e450ae8fe0ea4a119b4648781c912da0
+    parentId: fld_f64fd544c87444789389a4faf500e5cb
+    modified: 1714037162469
+    created: 1714036877442
+    url: http://localhost:9090/orgs/create
+    name: Create Organisation
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"orgDomain": "@somedomain.com",
+        	"orgName": "Some Domain"
+        }
+    preRequestScript: ""
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_d6be29b47c804a92a43e42b849ed3880
+      - name: User-Agent
+        value: insomnia/9.0.0
+        id: pair_ddc6dce240764bc1a2dbf74221349829
+      - id: pair_15317d35f5e9460daa3cdbd41810a992
+        name: Authorization
+        value: Basic cm9vdDpyb290
+        description: ""
+    authentication:
+      type: basic
+      useISO88591: false
+      disabled: true
+      username: root
+      password: root
+    metaSortKey: -1714036877442
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_259032c761fc412fab40928b6bd88e5f
+    parentId: fld_f64fd544c87444789389a4faf500e5cb
+    modified: 1714047809604
+    created: 1714037170278
+    url: http://localhost:9090/users
+    name: Register Org Admin
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"orgID": "",
+        	"email": "",
+        	"password": ""
+        }
+    preRequestScript: ""
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_b644f1e7a9ed4a39a1f45e08e502a0b1
+      - name: User-Agent
+        value: insomnia/9.0.0
+        id: pair_eeb5faf7553d48598389a25b8d84a240
+      - id: pair_dda00b7f6b804b909400c0d506f5bd43
+        name: Authorization
+        value: Bearer OrgAccessKey
+        description: ""
+    authentication: {}
+    metaSortKey: -1714037170278
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_842b398a04f245409726d4d2834cea3c
+    parentId: fld_f64fd544c87444789389a4faf500e5cb
+    modified: 1714038969554
+    created: 1714037904757
+    url: http://localhost:9090/orgs/01HW840WXF5TXPZW61FK2BCXXK/forms/01HWA67CK543J2CAGT6T1KGB3A
+    name: View Form Reports
+    description: ""
+    method: GET
+    body: {}
+    preRequestScript: ""
+    parameters: []
+    headers:
+      - name: User-Agent
+        value: insomnia/9.0.0
+        id: pair_a456d49d42d5449292c75e9a18a63404
+      - id: pair_179b0a1d070941929518dad89bd11eed
+        name: Authorization
+        value: Bearer cca77be016055f32d911e488b26acc38
+        description: ""
+    authentication: {}
+    metaSortKey: -1714037904757
+    isPrivate: false
+    pathParameters: []
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    parentId: wrk_scratchpad
+    modified: 1704619324504
+    created: 1699816816435
+    name: Base Environment
+    data:
+      "": ""
+    dataPropertyOrder:
+      "&":
+        - ""
+    color: null
+    isPrivate: false
+    metaSortKey: 1699816816435
+    _type: environment
+  - _id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    parentId: wrk_scratchpad
+    modified: 1699816816437
+    created: 1699816816437
+    name: Default Jar
+    cookies: []
+    _type: cookie_jar
