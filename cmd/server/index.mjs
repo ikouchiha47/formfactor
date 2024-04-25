@@ -17,7 +17,7 @@ import { UserController, UserOrgService, UsersRepository } from 'user-org-servic
 import { AuthyService } from 'auth-service/auth.mjs';
 import { OrgRepository } from 'user-org-service/organisations.mjs';
 import { FormsController, FormsRepository } from 'form-service/form.mjs';
-import { AuthorizationMiddleware } from '../../src/httputils/middleware.mjs';
+import { AuthorizationMiddleware, ValidateAuthorized } from '../../src/httputils/middleware.mjs';
 
 const args = parseArgs({
   options: {
@@ -60,6 +60,10 @@ const handlers = {
   }
 }
 
+function noOpHandler(req, res) {
+  res.status(500).json({ success: false, error: "not_implemented", errorCode: "G1002"})
+}
+
 export const setupApp = async (conf, mongoClient, sqlClient, redisClient) => {
   const app = express();
 
@@ -85,7 +89,11 @@ export const setupApp = async (conf, mongoClient, sqlClient, redisClient) => {
   app.post("/auth/login", loginHandler.orgUserLogin.bind(loginHandler))
 
   //TODO: handle rate-limits on access token
-  app.post("/orgs/:org_id/form", authMiddleware, formsHandler.create.bind(formsHandler))
+  app.post("/orgs/:orgID/forms", authMiddleware, ValidateAuthorized, formsHandler.create.bind(formsHandler))
+
+  app.get("/orgs/:orgID/forms/:formID", authMiddleware, noOpHandler)
+  app.post("/orgs/:orgID/forms/:formID", authMiddleware, formsHandler.createAnswer.bind(formsHandler))
+
 
   let port = Number(process.env.PORT);
 

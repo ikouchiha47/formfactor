@@ -63,7 +63,7 @@ export class MongoDBConnector {
       const db = this.connection.db(dbname);
       await db.admin().command({ enableSharding: dbname });
 
-      logger.debug("sharding enabled")
+      logger.info("sharding enabled for " + dbname)
 
       const collections = [
         {
@@ -77,21 +77,23 @@ export class MongoDBConnector {
       ];
 
 
-      await Promise.allSettled(
+      var results = await Promise.allSettled(
         collections.map(collection => db.createCollection(collection.name))
       )
 
+      console.log(results)
       logger.info("creating collections done")
 
-      await Promise.allSettled(
+      var results = await Promise.allSettled(
         collections.map(collection => {
-          db.admin().command({
+          return db.admin().command({
             shardCollection: `${dbname}.${collection.name}`,
             key: collection.shardKey,
           });
         })
       )
 
+      console.log(results)
       logger.info("setup collection sharding done")
 
     } catch (error) {
