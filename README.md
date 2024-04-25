@@ -4,8 +4,7 @@ Build forms and collect reports.
 
 ## Requirements
 
-- nodejs
-- mongosh, or
+- nodejs, v21.1+
 - docker-compose
 
 
