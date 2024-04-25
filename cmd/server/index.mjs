@@ -92,6 +92,8 @@ export const setupApp = async (conf, mongoClient, sqlClient, redisClient) => {
   app.post("/orgs/:orgID/forms", authMiddleware, ValidateAuthorized, formsHandler.create.bind(formsHandler))
 
   app.get("/orgs/:orgID/forms/:formID", authMiddleware, ValidateAuthorized, formsHandler.viewAnswers.bind(formsHandler))
+
+  // TODO: handle rate limits on req.body.uid (user email)
   app.post("/orgs/:orgID/forms/:formID", authMiddleware, formsHandler.createAnswer.bind(formsHandler))
 
 
