@@ -1,0 +1,7 @@
+{
+    "name": "auth-service",
+    "dependencies": {
+        "auth": "file:src/auth-service/auth.mjs"
+    }
+  }
+  

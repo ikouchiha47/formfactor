@@ -45,6 +45,7 @@ function OrgDBAdapter(dbResult) {
     let org = new Org(dbResult['org_domain'])
 
     org.id = dbResult['id']
+    org.orgName = dbResult['org_name']
     org.orgAccessKey = dbResult['org_access_key']
     org.blocked = dbResult['blocked']
 
@@ -65,7 +66,7 @@ export class OrgRepository {
     }
 
     async findByDomain(domain) {
-        const sql = `SELECT id, org_domain, org_access_key, blocked FROM ${Org.tableName} WHERE org_domain=?  LIMIT 1`;
+        const sql = `SELECT id, org_domain, org_name, org_access_key, blocked FROM ${Org.tableName} WHERE org_domain = ?  LIMIT 1`;
         const values = [domain]
         const [rows, _] = await this.dbconn.execute(sql, values)
 

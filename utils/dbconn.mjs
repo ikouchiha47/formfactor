@@ -33,22 +33,22 @@ export class RedisConnector {
 export class MongoDBConnector {
   constructor(uri) {
     this.uri = uri;
-    this.client = null;
+    this.connection = null;
   }
 
   async connect() {
-    if(this.client) {
-      return this.client
+    if(this.connection) {
+      return this.connection
     }
     
     try {
-      this.client = new MongoClient(
+      this.connection = new MongoClient(
         this.uri, {
         readPreference: ReadPreference.SECONDARY_PREFERRED,
         maxStalenessSeconds: 120,
       });
 
-      await this.client.connect();
+      await this.connection.connect();
       logger.debug("Connected to MongoDB successfully");
     } catch (error) {
       logger.error("Error connecting to MongoDB:", error);
@@ -60,7 +60,7 @@ export class MongoDBConnector {
     try {
       logger.info("Setting up MongoDB...");
 
-      const db = this.client.db(dbname);
+      const db = this.connection.db(dbname);
       await db.admin().command({ enableSharding: dbname });
 
       logger.debug("sharding enabled")
@@ -68,11 +68,11 @@ export class MongoDBConnector {
       const collections = [
         {
           name: "form_objects",
-          shardKey: { org_id: "hashed" }
+          shardKey: { orgID: "hashed" }
         },
         {
           name: "form_answers",
-          shardKey: { org_id: "hashed" }
+          shardKey: { orgID: "hashed" }
         }
       ];
 

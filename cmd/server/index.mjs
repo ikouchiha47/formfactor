@@ -13,6 +13,11 @@ import { parseArgs } from "node:util";
 import logger from "utils/logger.mjs";
 import * as config from "utils/config.mjs";
 import * as dbconnman from "utils/dbconn.mjs";
+import { UserController, UserOrgService, UsersRepository } from 'user-org-service/users.mjs';
+import { AuthyService } from 'auth-service/auth.mjs';
+import { OrgRepository } from 'user-org-service/organisations.mjs';
+import { FormsController, FormsRepository } from 'form-service/form.mjs';
+import { AuthorizationMiddleware } from '../../src/httputils/middleware.mjs';
 
 const args = parseArgs({
   options: {
@@ -32,8 +37,30 @@ const args = parseArgs({
   },
 });
 
+const deps = {
+  OrgService: (conn) => {
+    const orgRepo     = new OrgRepository(conn.connection)
+    const userRepo    = new UsersRepository(conn.connection) 
+    const userOrgSvc  = new UserOrgService(userRepo, orgRepo)
 
-export const setupApp = async (mongoClient, sqlClient, redisClient) => {
+    return userOrgSvc
+  },
+  AuthService: (conn) => {
+    const authSvc = new AuthyService(conn.connection)
+    return authSvc
+  },
+}
+
+const handlers = {
+  LoginHandler: (conn) => {
+    return new UserController(deps.OrgService(conn), deps.AuthService(conn))
+  },
+  FormsHandler: (conn, dbName) => {
+    return new FormsController(new FormsRepository(conn.connection, dbName))
+  }
+}
+
+export const setupApp = async (conf, mongoClient, sqlClient, redisClient) => {
   const app = express();
 
   const corsOptions = {
@@ -48,6 +75,17 @@ export const setupApp = async (mongoClient, sqlClient, redisClient) => {
   app.use(helmet());
   app.use(morgan('combined'));
   app.use(bodyParser.json());
+
+  const loginHandler = handlers.LoginHandler(sqlClient)
+  const formsHandler = handlers.FormsHandler(mongoClient)
+
+  const authMiddleware = AuthorizationMiddleware(deps.AuthService(sqlClient))
+
+  // TODO: handle rate-limits on user email
+  app.post("/auth/login", loginHandler.orgUserLogin.bind(loginHandler))
+
+  //TODO: handle rate-limits on access token
+  app.post("/orgs/:org_id/form", authMiddleware, formsHandler.create.bind(formsHandler))
 
   let port = Number(process.env.PORT);
 
@@ -64,7 +102,8 @@ export const setupApp = async (mongoClient, sqlClient, redisClient) => {
   });
 }
 
-const totalCPUs = os.availableParallelism();
+// const totalCPUs = os.availableParallelism();
+const totalCPUs = 2;
 
 if (cluster.isMaster) {
   logger.info(`Number of CPUs ${totalCPUs}`);
@@ -93,5 +132,5 @@ if (cluster.isMaster) {
   const redisConn = new dbconnman.RedisConnector(conf.redis_url)
   await redisConn.connect()
 
-  await setupApp(mongoConn, mysqlConn, redisConn);
+  await setupApp(conf, mongoConn, mysqlConn, redisConn);
 }

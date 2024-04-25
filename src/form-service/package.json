@@ -1,0 +1,6 @@
+{
+    "name": "form-service",
+    "dependencies": {
+        "form": "file:form-service/form.mjs"
+    }
+}

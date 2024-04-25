@@ -9,10 +9,12 @@
   "author": "ikouchiha47",
   "license": "SSPL",
   "dependencies": {
+    "auth-service": "file:src/auth-service",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "form-service": "file:src/form-service",
     "helmet": "^7.1.0",
     "mongoclient": "^1.0.3",
     "mongodb": "^6.5.0",

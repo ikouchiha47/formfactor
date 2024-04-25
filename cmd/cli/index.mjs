@@ -116,9 +116,6 @@ program.command('seed').
     } catch (e) {
       throw e
     }
-
-
-
   });
 
 
